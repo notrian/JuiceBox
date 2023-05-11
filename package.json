@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "seed:dev": "nodemon ./db/seed.js"
+    "start": "nodemon ./db/seed.js"
   },
   "keywords": [],
   "author": "",
