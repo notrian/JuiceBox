@@ -1,6 +1,5 @@
 const express = require("express");
 const morgan = require("morgan");
-// const seed = require("./db/seed");
 const { client, getAllPosts } = require("./db");
 
 const apiRouter = require("./api");
@@ -23,10 +22,10 @@ server.use(express.json());
 
 server.use("/api", apiRouter);
 
-server.use((err, req, res, next) => {
-  console.error(`Request failed (500) - ${err}`);
-  res.status(500).send("Something went wrong");
-});
+// server.use((err, req, res, next) => {
+//   console.error(`Request failed (500) - ${err}`);
+//   res.status(500).send("Something went wrong");
+// });
 
 server.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
