@@ -4,7 +4,8 @@ const jwt = require("jsonwebtoken");
 const express = require("express");
 const usersRouter = express.Router();
 
-const { getAllUsers, getUserByUsername, createUser } = require("../db");
+const { getAllUsers, getUserByUsername, createUser, getUserById, updateUser } = require("../db");
+const { requireUser } = require("./utils");
 
 usersRouter.use((req, res, next) => {
   console.log("A request is being made to /users");
@@ -18,6 +19,24 @@ usersRouter.get("/", async (req, res) => {
   res.send({
     users,
   });
+});
+
+usersRouter.patch("/:userId", requireUser, async (req, res, next) => {
+  const { userId } = req.params;
+
+  try {
+    if (userId === req.user.id) {
+      const user = await updateUser(userId, { active: true });
+      res.send({ user });
+    } else {
+      next({
+        name: "UnauthorizedUserError",
+        message: "You cannot update a user that is not you",
+      });
+    }
+  } catch ({ name, message }) {
+    next({ name, message });
+  }
 });
 
 usersRouter.post("/login", async (req, res, next) => {
@@ -40,7 +59,6 @@ usersRouter.post("/login", async (req, res, next) => {
         {
           id: user.id,
           username: user.username,
-          password: user.password,
         },
         process.env.JWT_SECRET,
         {
@@ -85,7 +103,6 @@ usersRouter.post("/register", async (req, res, next) => {
       {
         id: user.id,
         username,
-        password,
       },
       process.env.JWT_SECRET,
       {
@@ -97,6 +114,33 @@ usersRouter.post("/register", async (req, res, next) => {
       message: "thank you for signing up",
       token,
     });
+  } catch ({ name, message }) {
+    next({ name, message });
+  }
+});
+
+usersRouter.delete("/:userId", requireUser, async (req, res, next) => {
+  try {
+    const user = await getUserById(req.params.userId);
+
+    if (user && user.id === req.user.id) {
+      const deletedUser = await updateUser(user.id, { active: false });
+
+      res.send({ user: deletedUser });
+    } else {
+      // if there was a user, throw UnauthorizedUserError, otherwise throw PostNotFoundError
+      next(
+        user
+          ? {
+              name: "UnauthorizedUserError",
+              message: "You can only deactivate your account",
+            }
+          : {
+              name: "UserNotFoundError",
+              message: "That user does not exist",
+            }
+      );
+    }
   } catch ({ name, message }) {
     next({ name, message });
   }

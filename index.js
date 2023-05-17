@@ -7,7 +7,7 @@ const apiRouter = require("./api");
 const server = express();
 client.connect();
 
-const PORT = "6969";
+const PORT = "3000";
 
 server.use((req, res, next) => {
   console.log("<____Body Logger START____>");

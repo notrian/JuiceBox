@@ -4,9 +4,9 @@ const jwt = require("jsonwebtoken");
 const express = require("express");
 const apiRouter = express.Router();
 
-// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImYiLCJpYXQiOjE2ODQzMzcyNjgsImV4cCI6MTY4NDk0MjA2OH0.FTq40eIOCJ9vN3nJe7uqbi9rp_nh0Ncz_BUdzrSiiPY
+// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImYiLCJpYXQiOjE2ODQzMzg0ODgsImV4cCI6MTY4NDk0MzI4OH0.qQuP1C1mhmhw48hZzQUFwxDyPpVToGAx4HQVL3NybEE
 
-const { getUserById } = require("../db");
+const { getUserById, getUserByUsername } = require("../db");
 const { JWT_SECRET } = process.env;
 
 // set `req.user` if possible
@@ -21,10 +21,10 @@ apiRouter.use(async (req, res, next) => {
     const token = auth.slice(prefix.length);
 
     try {
-      const { id } = jwt.verify(token, JWT_SECRET);
+      const { username } = jwt.verify(token, JWT_SECRET);
 
-      if (id) {
-        req.user = await getUserById(id);
+      if (username) {
+        req.user = await getUserByUsername(username);
         next();
       }
     } catch ({ name, message }) {
@@ -47,8 +47,8 @@ apiRouter.use((req, res, next) => {
 });
 
 const usersRouter = require("./users");
-const tagsRouter = require("./tags");
 const postsRouter = require("./posts");
+const tagsRouter = require("./tags");
 
 apiRouter.use("/users", usersRouter);
 apiRouter.use("/posts", postsRouter);
