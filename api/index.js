@@ -1,4 +1,3 @@
-// api/index.js
 const express = require("express");
 const apiRouter = express.Router();
 

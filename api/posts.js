@@ -1,4 +1,3 @@
-// api/users.js
 const express = require("express");
 const postsRouter = express.Router();
 const { getAllPosts } = require("../db");

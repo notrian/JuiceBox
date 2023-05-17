@@ -1,4 +1,3 @@
-// api/users.js
 const express = require("express");
 const tagsRouter = express.Router();
 const { getAllTags } = require("../db");
