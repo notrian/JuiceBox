@@ -9,7 +9,7 @@ const PORT = "3000";
 client.connect();
 
 // middleware for logging + formatting incoming requests
-server.use(morgan("dev"));
+server.use(morgan("tiny"));
 server.use(express.json());
 
 // route all requests to the api router

@@ -8,20 +8,6 @@ const usersRouter = express.Router();
 const { getAllUsers, getUserByUsername, createUser, getUserById, updateUser } = require("../db");
 const { requireUser } = require("./utils");
 
-usersRouter.use((req, res, next) => {
-  console.log("A request is being made to /users");
-
-  next();
-});
-
-usersRouter.get("/", async (req, res) => {
-  const users = await getAllUsers();
-
-  res.send({
-    users,
-  });
-});
-
 usersRouter.patch("/:userId", requireUser, async (req, res, next) => {
   const { userId } = req.params;
 
