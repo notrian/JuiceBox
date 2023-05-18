@@ -1,5 +1,6 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
+const { JWT_SECRET } = process.env;
 
 const express = require("express");
 const usersRouter = express.Router();
@@ -39,6 +40,34 @@ usersRouter.patch("/:userId", requireUser, async (req, res, next) => {
   }
 });
 
+usersRouter.post("/auth", async (req, res, next) => {
+  const prefix = "Bearer ";
+  const auth = req.header("Authorization");
+
+  // request must have both
+  if (!auth) {
+    next({
+      name: "MissingAuthorizationHeader",
+      message: "Please supply a valid authorization header",
+    });
+  } else {
+    try {
+      const token = auth.slice(prefix.length);
+      const { username, iat } = jwt.verify(token, JWT_SECRET);
+      res.send({
+        status: "200",
+        status_message: "Successfully authenticated!",
+        data: {
+          username,
+          iat,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+});
+
 usersRouter.post("/login", async (req, res, next) => {
   const { username, password } = req.body;
 
@@ -58,7 +87,8 @@ usersRouter.post("/login", async (req, res, next) => {
       const token = jwt.sign(
         {
           id: user.id,
-          username: user.username,
+          username,
+          password,
         },
         process.env.JWT_SECRET,
         {
@@ -66,7 +96,7 @@ usersRouter.post("/login", async (req, res, next) => {
         }
       );
 
-      res.send({ message: "you're logged in!", token });
+      res.send({ message: "Successfully logged in!", token });
     } else {
       next({
         name: "IncorrectCredentialsError",
@@ -74,7 +104,6 @@ usersRouter.post("/login", async (req, res, next) => {
       });
     }
   } catch (error) {
-    console.log(error);
     next(error);
   }
 });
@@ -103,6 +132,7 @@ usersRouter.post("/register", async (req, res, next) => {
       {
         id: user.id,
         username,
+        password,
       },
       process.env.JWT_SECRET,
       {
@@ -111,7 +141,7 @@ usersRouter.post("/register", async (req, res, next) => {
     );
 
     res.send({
-      message: "thank you for signing up",
+      message: "Successfully registered!",
       token,
     });
   } catch ({ name, message }) {

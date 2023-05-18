@@ -1,32 +1,21 @@
 const express = require("express");
 const morgan = require("morgan");
-const { client, getAllPosts } = require("./db");
+// client used for connect to postgresql db
+const { client } = require("./db");
 
-const apiRouter = require("./api");
-
+// connect to server and db
 const server = express();
+const PORT = "3000";
 client.connect();
 
-const PORT = "3000";
-
-server.use((req, res, next) => {
-  console.log("<____Body Logger START____>");
-  console.log(req.body);
-  console.log("<_____Body Logger END_____>");
-
-  next();
-});
-
+// middleware for logging + formatting incoming requests
 server.use(morgan("dev"));
 server.use(express.json());
 
-server.use("/api", apiRouter);
+// route all requests to the api router
+server.use("/", require("./api"));
 
-// server.use((err, req, res, next) => {
-//   console.error(`Request failed (500) - ${err}`);
-//   res.status(500).send("Something went wrong");
-// });
-
+// start running server
 server.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });

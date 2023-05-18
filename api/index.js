@@ -18,9 +18,8 @@ apiRouter.use(async (req, res, next) => {
     // nothing to see here
     next();
   } else if (auth.startsWith(prefix)) {
-    const token = auth.slice(prefix.length);
-
     try {
+      const token = auth.slice(prefix.length);
       const { username } = jwt.verify(token, JWT_SECRET);
 
       if (username) {
@@ -50,11 +49,19 @@ const usersRouter = require("./users");
 const postsRouter = require("./posts");
 const tagsRouter = require("./tags");
 
-apiRouter.use("/users", usersRouter);
 apiRouter.use("/posts", postsRouter);
 apiRouter.use("/tags", tagsRouter);
+apiRouter.use("/", usersRouter);
+
+apiRouter.all("*", (req, res, next) => {
+  next({
+    name: "404",
+    message: "Page not found",
+  });
+});
 
 apiRouter.use((error, req, res, next) => {
+  res.status(error.error_status || 500);
   res.send({
     name: error.name,
     message: error.message,
