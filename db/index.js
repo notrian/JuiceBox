@@ -1,7 +1,8 @@
+require("dotenv").config();
 const { Client } = require("pg"); // imports the pg module
-
 // supply the db name and location of the database
-const client = new Client("postgres://localhost:5432/juicebox-dev");
+const { DB_URL } = process.env;
+const client = new Client(DB_URL);
 
 async function getAllUsers() {
   const { rows } = await client.query(
